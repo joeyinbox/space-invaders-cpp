@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
+#include "Game.h"
 
 #ifndef DEF_WINDOW
 #define DEF_WINDOW
@@ -23,10 +24,13 @@
 			Dimension window;
 			Stage stage;
 			SDL_Rect pos;
+			Game game;
 			
 			Window();
 			~Window();
 			void displayMainScreen();
+			void displayInGameScreen();
+			void startNewGame();
 			void handleEvents();
 			void handleMainKeyStroke(int key);
 			void handleInGameKeyStroke(int key);

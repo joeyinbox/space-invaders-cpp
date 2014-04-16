@@ -159,7 +159,18 @@ void Window::displayMainScreen() {
 	SDL_Flip(this->screen);
 }
 
+void Window::displayInGameScreen() {
+	
+}
 
+
+void Window::startNewGame() {
+	// Set the current stage to In Game
+	this->stage = INGAME;
+	
+	// Starts a new game
+	this->game.reset();
+}
 
 void Window::handleEvents() {
 	int run = 1;
@@ -195,7 +206,7 @@ void Window::handleEvents() {
 void Window::handleMainKeyStroke(int key) {
 	switch(key) {
     	case SDLK_SPACE:
-			printf("space bar pressed!\n");
+			this->startNewGame();
 			break;
 		default:
 			break;
