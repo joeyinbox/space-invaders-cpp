@@ -18,9 +18,10 @@
 
 	class Window {
 		public:
-			SDL_Surface *screen, *txt, *crab, *squid, *octopus, *spaceship;
+			SDL_Surface *screen, *txt;
 			TTF_Font *fontTitle, *fontMenu, *fontStatus;
 			SDL_Color white;
+			SDL_Rect baseline;
 			Dimension window;
 			Stage stage;
 			SDL_Rect pos;
@@ -30,6 +31,7 @@
 			~Window();
 			void displayMainScreen();
 			void displayInGameScreen();
+			void displayGameOver();
 			void startNewGame();
 			void handleEvents();
 			void handleMainKeyStroke(int key);

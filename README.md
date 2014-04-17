@@ -11,7 +11,7 @@ Requirements
 How to Compile on OSX
 -------------
 ```
-g++ Crab.cpp Bullet.cpp Attacker.cpp Game.cpp Window.cpp main.cpp -o SpaceInvaders -std=c++11 -lSDLmain -lSDL -lSDL_Image -lSDL_Ttf -framework Cocoa
+g++ Bullet.cpp Crab.cpp Octopus.cpp Squid.cpp Spaceship.cpp Attacker.cpp Window.cpp Game.cpp main.cpp -o SpaceInvaders -std=c++11 -lSDLmain -lSDL -lSDL_Image -lSDL_Ttf -framework Cocoa
 ```
 
 Credits
