@@ -13,6 +13,7 @@
 			int worth;
 			int resistance;
 			int width;
+			int margin;
 			Type type;
 			Game *game;
 			
