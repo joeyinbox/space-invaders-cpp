@@ -237,13 +237,7 @@ void Window::displayInGameScreen() {
 				}
 			}
 		}
-		
-		
 	}
-	
-	
-	
-	
 	
 	// Draw the player
 	this->pos.x = this->game.playerPosition.x;
@@ -275,10 +269,14 @@ void Window::startNewGame() {
 
 void Window::handleEvents() {
 	int run = 1;
+	int currentTimestamp, previousTimestamp = 0;
 	SDL_Event event;
 	
+	// Allow to hold a key for repeated actions
+	SDL_EnableKeyRepeat(10, 10);
+	
 	while(run) {
-		SDL_WaitEvent(&event);
+		SDL_PollEvent(&event);
 		switch(event.type) {
 			case SDL_QUIT:
 				run = 0;
@@ -301,6 +299,15 @@ void Window::handleEvents() {
 			default:
 				break;
 		}
+		
+		// Pause the application for 30ms
+		currentTimestamp = SDL_GetTicks();
+		if(currentTimestamp-previousTimestamp>30) {
+		    previousTimestamp = currentTimestamp;
+		}
+		else {
+			SDL_Delay(30-(currentTimestamp-previousTimestamp));
+		}
 	}
 }
 
@@ -320,14 +327,14 @@ void Window::handleInGameKeyStroke(int key) {
 			printf("Fire!\n");
 			break;
     	case SDLK_LEFT:
-			if(this->game.playerPosition.x>=20) {
-				this->game.move(-20);
+			if(this->game.playerPosition.x>=5) {
+				this->game.move(-5);
 				this->displayInGameScreen();
 			}
 			break;
     	case SDLK_RIGHT:
-			if(this->game.playerPosition.x<=this->window.width-this->game.player->w-20) {
-				this->game.move(20);
+			if(this->game.playerPosition.x<=this->window.width-this->game.player->w-5) {
+				this->game.move(5);
 				this->displayInGameScreen();
 			}
 			break;
