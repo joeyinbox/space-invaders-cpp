@@ -33,7 +33,7 @@ Window::Window() {
 	
 	
 	// Initialise the video and font library
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 	TTF_Init();
 	
 	// Load all fonts
@@ -269,7 +269,7 @@ void Window::startNewGame() {
 
 void Window::handleEvents() {
 	int run = 1;
-	int currentTimestamp, previousTimestamp = 0;
+	int currentTimestamp, previousTimestamp = SDL_GetTicks();
 	SDL_Event event;
 	
 	// Allow to hold a key for repeated actions
@@ -277,33 +277,41 @@ void Window::handleEvents() {
 	
 	while(run) {
 		SDL_PollEvent(&event);
-		switch(event.type) {
-			case SDL_QUIT:
-				run = 0;
-				break;
-			case SDL_KEYDOWN:
-				// Allow to exit the game at any time
-				if(event.key.keysym.sym==SDLK_ESCAPE) {
-					run = 0;
-					break;
-				}
-				
-				// Behaves differently depending on the current stage
-				if(this->stage==MAIN) {
-					this->handleMainKeyStroke(event.key.keysym.sym);
-				}
-				else if(this->stage==INGAME) {
-					this->handleInGameKeyStroke(event.key.keysym.sym);
-				}
-				break;
-			default:
-				break;
-		}
 		
 		// Pause the application for 30ms
 		currentTimestamp = SDL_GetTicks();
 		if(currentTimestamp-previousTimestamp>30) {
 		    previousTimestamp = currentTimestamp;
+			
+			// Handle an eventual input from the user
+			switch(event.type) {
+				case SDL_QUIT:
+					run = 0;
+					break;
+				case SDL_KEYDOWN:
+					// Allow to exit the game at any time
+					if(event.key.keysym.sym==SDLK_ESCAPE) {
+						run = 0;
+						break;
+					}
+				
+					// Behaves differently depending on the current stage
+					if(this->stage==MAIN) {
+						this->handleMainKeyStroke(event.key.keysym.sym);
+					}
+					else if(this->stage==INGAME) {
+						this->handleInGameKeyStroke(event.key.keysym.sym);
+					}
+					break;
+				default:
+					break;
+			}
+			
+			// Update the attackers position while in game
+			if(this->stage==INGAME) {
+				this->game.update(currentTimestamp);
+				this->displayInGameScreen();
+			}
 		}
 		else {
 			SDL_Delay(30-(currentTimestamp-previousTimestamp));
@@ -329,13 +337,11 @@ void Window::handleInGameKeyStroke(int key) {
     	case SDLK_LEFT:
 			if(this->game.playerPosition.x>=5) {
 				this->game.move(-5);
-				this->displayInGameScreen();
 			}
 			break;
     	case SDLK_RIGHT:
 			if(this->game.playerPosition.x<=this->window.width-this->game.player->w-5) {
 				this->game.move(5);
-				this->displayInGameScreen();
 			}
 			break;
 		default:

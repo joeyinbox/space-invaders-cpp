@@ -29,6 +29,8 @@
 			std::vector<Attacker> attacker;
 			std::vector<Bunker> bunker;
 			Position attackerPosition, playerPosition;
+			int direction;
+			int timestamp, timestampShift;
 			
 			Game();
 			~Game();
@@ -38,7 +40,8 @@
 			void decreaseLife();
 			void move(int shift);
 			void tick();
-			int getSpeedFactor();
+			int getSpeedFactor(int now);
+			void update(int now);
 	};
 	
 #endif

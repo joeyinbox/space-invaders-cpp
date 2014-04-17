@@ -86,6 +86,11 @@ void Game::reset() {
 	this->attackerPosition.y = 150;
 	this->playerPosition.x = 100;
 	this->playerPosition.y = 0;
+	this->direction = 1;
+	
+	// Hold the time of the beginning of the game
+	this->timestamp = SDL_GetTicks();
+	this->timestampShift = this->timestamp;
 	
 	// Clear an eventual previous array of attackers
 	this->attacker.clear();
@@ -120,6 +125,18 @@ void Game::reset() {
 	for(int i=0; i<4; i++) {
 		Bunker bunker = Bunker(i);
 		this->bunker.push_back(bunker);
+	}
+}
+
+void Game::update(int now) {
+	if(this->attackerPosition.x<=0 || this->attackerPosition.x+855>=1024) {
+		this->direction *= -1;
+	}
+	this->attackerPosition.x += this->direction;
+	
+	if(now>this->timestampShift+5000) {
+		this->attackerPosition.y += 10;
+		this->timestampShift = now;
 	}
 }
 
