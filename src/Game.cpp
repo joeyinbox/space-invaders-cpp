@@ -10,11 +10,12 @@ using namespace std;
 
 Game::Game() {
 	// Load all resources
-	this->player = IMG_Load("res/img/player.png");
+	this->playerSurface = IMG_Load("res/img/player.png");
 	this->crab = IMG_Load("res/img/crab.png");
 	this->octopus = IMG_Load("res/img/octopus.png");
 	this->squid = IMG_Load("res/img/squid.png");
 	this->spaceship = IMG_Load("res/img/spaceship.png");
+	this->bulletSurface = IMG_Load("res/img/bullet.png");
 	
 	// Load all bunker resources
 	this->bunkerTopLeftSurface.push_back(IMG_Load("res/img/bunker/top-left-0.png"));
@@ -52,10 +53,12 @@ Game::Game() {
 
 Game::~Game() {
 	// Free all resources
+	SDL_FreeSurface(this->playerSurface);
 	SDL_FreeSurface(this->crab);
 	SDL_FreeSurface(this->octopus);
 	SDL_FreeSurface(this->squid);
 	SDL_FreeSurface(this->spaceship);
+	SDL_FreeSurface(this->bulletSurface);
 	
 	for(int i=0; i<this->bunkerTopLeftSurface.size(); i++) {
 		SDL_FreeSurface(this->bunkerTopLeftSurface[i]);
@@ -80,12 +83,9 @@ Game::~Game() {
 void Game::reset() {
 	this->level = 1;
 	this->score = 0;
-	this->life = 3;
 	this->active = true;
 	this->attackerPosition.x = 80;
 	this->attackerPosition.y = 150;
-	this->playerPosition.x = 100;
-	this->playerPosition.y = 0;
 	this->direction = 1;
 	
 	// Hold the time of the beginning of the game
@@ -126,6 +126,12 @@ void Game::reset() {
 		Bunker bunker = Bunker(i);
 		this->bunker.push_back(bunker);
 	}
+	
+	// Clear all eventual bullets
+	this->bullet.clear();
+	
+	// Reset the player informations
+	this->player.reset();
 }
 
 void Game::update(int now) {
@@ -138,15 +144,41 @@ void Game::update(int now) {
 		this->attackerPosition.y += 10;
 		this->timestampShift = now;
 	}
+	
+	// TODO: update bullets positions
+	for(int i=0; i<this->bullet.size(); i++) {
+		if(this->bullet[i].direction==UP) {
+			this->bullet[i].y -= 5;
+		}
+		else {
+			this->bullet[i].y += 5;
+		}
+	}
 }
 
 void Game::decreaseLife() {
-	if(--this->life==0) {
+	if(--this->player.life==0) {
 		// TODO: implement end of game
 		this->active = false;
 	}
 }
 
 void Game::move(int shift) {
-	this->playerPosition.x += shift;
+	this->player.move(shift);
+}
+
+int Game::getPlayerLife() {
+	return this->player.life;
+}
+
+int Game::getPlayerPosition() {
+	return this->player.x;
+}
+
+void Game::playerFire() {
+	if(!this->player.firing) {
+		this->player.firing = true;
+		Bullet bullet = Bullet(this->getPlayerPosition()+(this->playerSurface->w/2), 755-this->playerSurface->h, UP);
+		this->bullet.push_back(bullet);
+	}
 }

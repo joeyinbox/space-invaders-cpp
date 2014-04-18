@@ -138,7 +138,7 @@ void Window::displayMainScreen() {
 	
 	
 	// Display the instructions
-	this->txt = TTF_RenderText_Blended(this->fontMenu, "PRESS SPACE TO PLAY", this->white);
+	this->txt = TTF_RenderText_Blended(this->fontMenu, "PRESS ENTER TO PLAY", this->white);
 	this->pos.x = (this->window.width/2)-(this->txt->w/2);
 	this->pos.y = 700;
 	SDL_BlitSurface(this->txt, NULL, this->screen, &pos);
@@ -168,7 +168,7 @@ void Window::displayInGameScreen() {
 	SDL_BlitSurface(this->txt, NULL, this->screen, &pos);
 	
 	// Life
-	sprintf(txt, "LIFE: %d", this->game.life);
+	sprintf(txt, "LIFE: %d", this->game.getPlayerLife());
 	this->txt = TTF_RenderText_Blended(this->fontStatus, txt, this->white);
 	this->pos.x = this->window.width-this->txt->w-20;
 	this->pos.y = 20;
@@ -239,10 +239,17 @@ void Window::displayInGameScreen() {
 		}
 	}
 	
+	// Draw the bullets
+	for(int i=0; i<this->game.bullet.size(); i++) {
+		this->pos.x = this->game.bullet[i].x;
+		this->pos.y = this->game.bullet[i].y;
+		SDL_BlitSurface(this->game.bulletSurface, NULL, this->screen, &pos);
+	}
+	
 	// Draw the player
-	this->pos.x = this->game.playerPosition.x;
-	this->pos.y = this->window.height-15-this->game.player->h;
-	SDL_BlitSurface(this->game.player, NULL, this->screen, &pos);
+	this->pos.x = this->game.getPlayerPosition();
+	this->pos.y = this->window.height-15-this->game.playerSurface->h;
+	SDL_BlitSurface(this->game.playerSurface, NULL, this->screen, &pos);
 	
 	// Draw baseline
 	SDL_FillRect(this->screen, &this->baseline, SDL_MapRGB(this->screen->format, 62, 255, 63));
@@ -321,7 +328,8 @@ void Window::handleEvents() {
 
 void Window::handleMainKeyStroke(int key) {
 	switch(key) {
-    	case SDLK_SPACE:
+		case SDLK_RETURN:
+    	case SDLK_KP_ENTER:
 			this->startNewGame();
 			break;
 		default:
@@ -332,15 +340,15 @@ void Window::handleMainKeyStroke(int key) {
 void Window::handleInGameKeyStroke(int key) {
 	switch(key) {
     	case SDLK_SPACE:
-			printf("Fire!\n");
+			this->game.playerFire();
 			break;
     	case SDLK_LEFT:
-			if(this->game.playerPosition.x>=5) {
+			if(this->game.getPlayerPosition()>=5) {
 				this->game.move(-5);
 			}
 			break;
     	case SDLK_RIGHT:
-			if(this->game.playerPosition.x<=this->window.width-this->game.player->w-5) {
+			if(this->game.getPlayerPosition()<=this->window.width-this->game.playerSurface->w-5) {
 				this->game.move(5);
 			}
 			break;

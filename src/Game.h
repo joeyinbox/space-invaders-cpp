@@ -2,6 +2,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include "Attacker.h"
+#include "Player.h"
 #include "Bunker.h"
 
 #ifndef DEF_GAME
@@ -16,9 +17,8 @@
 		public:
 			int score;
 			int level;
-			int life;
 			bool active;
-			SDL_Surface *player, *crab, *octopus, *squid, *spaceship;
+			SDL_Surface *playerSurface, *crab, *octopus, *squid, *spaceship, *bulletSurface;
 			std::vector<SDL_Surface*> bunkerTopLeftSurface, 
 									  bunkerTopRightSurface, 
 									  bunkerBottomLeftSurface, 
@@ -28,7 +28,9 @@
 									  bunkerPlainSurface;
 			std::vector<Attacker> attacker;
 			std::vector<Bunker> bunker;
-			Position attackerPosition, playerPosition;
+			std::vector<Bullet> bullet;
+			Position attackerPosition;
+			Player player;
 			int direction;
 			int timestamp, timestampShift;
 			
@@ -42,6 +44,9 @@
 			void tick();
 			int getSpeedFactor(int now);
 			void update(int now);
+			int getPlayerLife();
+			int getPlayerPosition();
+			void playerFire();
 	};
 	
 #endif
