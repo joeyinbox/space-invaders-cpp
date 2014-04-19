@@ -2,6 +2,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include "Attacker.h"
+#include "Spaceship.h"
 #include "Player.h"
 #include "Bunker.h"
 
@@ -23,7 +24,7 @@
 			int score;
 			int level;
 			bool active;
-			SDL_Surface *playerSurface, *crab, *octopus, *squid, *spaceship, *bulletSurface;
+			SDL_Surface *playerSurface, *crab, *octopus, *squid, *spaceshipSurface, *bulletSurface;
 			std::vector<SDL_Surface*> bunkerTopLeftSurface, 
 									  bunkerTopRightSurface, 
 									  bunkerBottomLeftSurface, 
@@ -36,6 +37,7 @@
 			std::vector<Bullet> bullet;
 			Position attackerPosition;
 			Player player;
+			Spaceship spaceship = Spaceship(0, 2, this);
 			int direction;
 			int timestamp;
 			int bunkerInitialY;

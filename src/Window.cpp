@@ -127,7 +127,7 @@ void Window::displayMainScreen() {
 	// Display points table icons
 	this->pos.x -= 65;
 	this->pos.y = 330;
-	SDL_BlitSurface(this->game.spaceship, NULL, this->screen, &pos);
+	SDL_BlitSurface(this->game.spaceshipSurface, NULL, this->screen, &pos);
 	
 	this->pos.y += 60;
 	SDL_BlitSurface(this->game.octopus, NULL, this->screen, &pos);
@@ -193,10 +193,16 @@ void Window::displayInGameScreen() {
 			case SQUID:
 				SDL_BlitSurface(this->game.squid, NULL, this->screen, &pos);
 				break;
-			case SPACESHIP:
-				SDL_BlitSurface(this->game.spaceship, NULL, this->screen, &pos);
+			default:
 				break;
 		}
+	}
+	
+	// Display an eventual spaceship
+	if(this->game.spaceship.active) {
+		this->pos.x = this->game.spaceship.x;
+		this->pos.y = this->game.spaceship.y;
+		SDL_BlitSurface(this->game.spaceshipSurface, NULL, this->screen, &pos);
 	}
 	
 	

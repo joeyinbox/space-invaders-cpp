@@ -17,7 +17,7 @@ Game::Game() {
 	this->crab = IMG_Load("res/img/crab.png");
 	this->octopus = IMG_Load("res/img/octopus.png");
 	this->squid = IMG_Load("res/img/squid.png");
-	this->spaceship = IMG_Load("res/img/spaceship.png");
+	this->spaceshipSurface = IMG_Load("res/img/spaceship.png");
 	this->bulletSurface = IMG_Load("res/img/bullet.png");
 	
 	// Load all bunker resources
@@ -59,14 +59,13 @@ Game::Game() {
 	this->bunkerInitialY = 600;
 }
 
-
 Game::~Game() {
 	// Free all resources
 	SDL_FreeSurface(this->playerSurface);
 	SDL_FreeSurface(this->crab);
 	SDL_FreeSurface(this->octopus);
 	SDL_FreeSurface(this->squid);
-	SDL_FreeSurface(this->spaceship);
+	SDL_FreeSurface(this->spaceshipSurface);
 	SDL_FreeSurface(this->bulletSurface);
 	
 	for(int i=0; i<this->bunkerTopLeftSurface.size(); i++) {
@@ -146,6 +145,9 @@ void Game::reset() {
 	
 	// Reset the player informations
 	this->player.reset();
+	
+	// Reset an eventual spaceship
+	this->spaceship.reset();
 }
 
 void Game::update(int now) {
@@ -177,6 +179,16 @@ void Game::update(int now) {
 		if(this->attacker[extremV].y+this->attacker[extremV].height+this->attackerPosition.y>this->bunkerInitialY+72) {
 			// Game over
 			this->active = false;
+		}
+	}
+	
+	// Move an eventual spaceship
+	if(this->spaceship.active) {
+		this->spaceship.x += this->spaceship.direction*(3+(int)round(this->getSpeedFactor(now)));
+		
+		// Did it get out of the screen?
+		if(this->spaceship.x+this->spaceshipSurface->w<0 || this->spaceship.x>=1024) {
+			this->spaceship.reset();
 		}
 	}
 	
@@ -215,9 +227,10 @@ void Game::update(int now) {
 				}
 			}
 			
-			// Check if the bullet touched an attacker
+			// Check if the bullet touched an attacker or a spaceship
 			if(still && this->bullet[i].direction==UP) {
 				for(int j=this->attacker.size()-1; j>=0; j--) {
+					// Attacker
 					if(this->bullet[i].x>=this->attackerPosition.x+this->attacker[j].x && this->bullet[i].x<=this->attackerPosition.x+this->attacker[j].x+this->attacker[j].width
 					&& this->bullet[i].y>=this->attackerPosition.y+this->attacker[j].y && this->bullet[i].y<=this->attackerPosition.y+this->attacker[j].y+this->attacker[j].height) {
 						
@@ -239,6 +252,22 @@ void Game::update(int now) {
 							this->player.life++;
 							this->reset();
 						}
+						break;
+					}
+					// Spaceship
+					else if(this->spaceship.active && this->bullet[i].x>=this->spaceship.x && this->bullet[i].x<=this->spaceship.x+this->spaceshipSurface->w 
+					&& this->bullet[i].y>=this->spaceship.y && this->bullet[i].y<=this->spaceship.y+this->spaceshipSurface->h) {
+						// Increase the score
+						this->score += this->spaceship.worth;
+						
+						// Destroy eventually that attacker
+						if(this->spaceship.hurt()) {
+							this->spaceship.reset();
+						}
+						
+						// Eventually allow the player to fire again and remove the bullet
+						this->wasPlayerBullet(i);
+						this->bullet.erase(bullet.begin()+i);
 						break;
 					}
 				}
@@ -287,6 +316,19 @@ void Game::update(int now) {
 		int id = rand()%lowest.size();
 		Bullet bullet = Bullet(this->attackerPosition.x+this->attacker[lowest[id]].x+(this->attacker[lowest[id]].width/2), this->attacker[lowest[id]].y+this->attackerPosition.y+this->attacker[lowest[id]].height, false, DOWN);
 		this->bullet.push_back(bullet);
+	}
+	
+	
+	// Finally, a spaceship can spawn
+	probability = rand()%1000;
+	if(!this->spaceship.active && probability>995) {
+		printf("%d\n", probability);
+		if(probability%2==0) {
+			this->spaceship.setDirection(1);
+		}
+		else {
+			this->spaceship.setDirection(-1);
+		}
 	}
 }
 
