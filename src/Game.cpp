@@ -123,7 +123,7 @@ void Game::reset() {
 	
 	// Populate all new bunkers
 	for(int i=0; i<4; i++) {
-		Bunker bunker = Bunker(i);
+		Bunker bunker = Bunker(i, 600);
 		this->bunker.push_back(bunker);
 	}
 	
@@ -145,13 +145,43 @@ void Game::update(int now) {
 		this->timestampShift = now;
 	}
 	
-	// TODO: update bullets positions
+	// Update bullets positions
 	for(int i=0; i<this->bullet.size(); i++) {
-		if(this->bullet[i].direction==UP) {
-			this->bullet[i].y -= 5;
+		this->bullet[i].move();
+		
+		// Check if the bullet got out of the screen
+		if(this->bullet[i].y<0-this->bulletSurface->h || this->bullet[i].y>770) {
+			this->bullet.erase(bullet.begin()+i);
+			// Eventually notify the user that he can fire again
+			this->wasPlayerBullet(i);
 		}
 		else {
-			this->bullet[i].y += 5;
+			// Check if the bullet touched a bunker
+			bool still = true;
+			for(int j=0; j<this->bunker.size(); j++) {
+				for(int k=0; k<this->bunker[j].part.size(); k++) {
+					if(this->bullet[i].x>=this->bunker[j].part[k].x && this->bullet[i].x<=this->bunker[j].part[k].x+(this->bunker[j].width/4)
+					&& this->bullet[i].y>=this->bunker[j].part[k].y && this->bullet[i].y<=this->bunker[j].part[k].y+(this->bunker[j].width/4)) {
+						this->bunker[j].hurt(k);
+						this->bullet.erase(bullet.begin()+i);
+						// Eventually notify the user that he can fire again
+						this->wasPlayerBullet(i);
+						
+						// There is no break for nested loops in C++ --> A flag or a Goto?
+						still = false;
+						break;
+					}
+				}
+				
+				// Check if the bullet touched an attacker
+				if(still && this->bullet[i].direction==UP) {
+					
+				}
+				// Check if the bullet touched the player
+				else if(still && this->bullet[i].direction==DOWN) {
+					
+				}
+			}
 		}
 	}
 }
@@ -175,10 +205,16 @@ int Game::getPlayerPosition() {
 	return this->player.x;
 }
 
+void Game::wasPlayerBullet(int id) {
+	if(this->player.firing==id) {
+		this->player.firing = -1;
+	}
+}
+
 void Game::playerFire() {
-	if(!this->player.firing) {
-		this->player.firing = true;
+	if(this->player.firing==-1) {
 		Bullet bullet = Bullet(this->getPlayerPosition()+(this->playerSurface->w/2), 755-this->playerSurface->h, UP);
 		this->bullet.push_back(bullet);
+		this->player.firing = this->bullet.size()-1;
 	}
 }

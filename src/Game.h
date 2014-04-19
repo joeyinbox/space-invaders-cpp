@@ -47,6 +47,7 @@
 			int getPlayerLife();
 			int getPlayerPosition();
 			void playerFire();
+			void wasPlayerBullet(int id);
 	};
 	
 #endif

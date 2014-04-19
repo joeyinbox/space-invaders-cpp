@@ -7,7 +7,7 @@ Player::Player() {
 void Player::reset() {
 	this->life = 3;
 	this->x = 100;
-	this->firing = false;
+	this->firing = -1;
 }
 
 void Player::move(int shift) {

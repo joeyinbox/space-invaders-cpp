@@ -8,7 +8,7 @@
 			int life;
 			int x;
 			int width;
-			bool firing;
+			int firing;
 			
 			Player();
 			void move(int direction);

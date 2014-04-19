@@ -7,7 +7,12 @@ Bullet::Bullet(int x, int y, Direction direction) {
 }
 
 void Bullet::move() {
-	
+	if(this->direction==UP) {
+		this->y -= 5;
+	}
+	else {
+		this->y += 5;
+	}
 }
 
 void Bullet::explode() {

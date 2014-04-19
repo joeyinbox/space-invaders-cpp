@@ -199,42 +199,32 @@ void Window::displayInGameScreen() {
 	
 	// Draw all bunkers
 	for(int i=0; i<this->game.bunker.size(); i++) {
-		for(int j=0; j<3; j++) {
-			for(int k=0; k<4; k++) {
-				if(this->game.bunker[i].part[j][k].state!=DESTROYED) {
-					this->pos.y = 600;
-					this->pos.x = 170+(i*this->game.bunker[i].width)+(this->game.bunker[i].x*100)+(k*24);
-					switch(this->game.bunker[i].part[j][k].type) {
-						case TOP_LEFT:
-							SDL_BlitSurface(this->game.bunkerTopLeftSurface[this->game.bunker[i].part[j][k].state], NULL, this->screen, &pos);
-							break;
-						case TOP_RIGHT:
-							SDL_BlitSurface(this->game.bunkerTopRightSurface[this->game.bunker[i].part[j][k].state], NULL, this->screen, &pos);
-							break;
-						case BOTTOM_LEFT:
-							this->pos.y += 48;
-							SDL_BlitSurface(this->game.bunkerBottomLeftSurface[this->game.bunker[i].part[j][k].state], NULL, this->screen, &pos);
-							break;
-						case BOTTOM_RIGHT:
-							this->pos.y += 48;
-							SDL_BlitSurface(this->game.bunkerBottomRightSurface[this->game.bunker[i].part[j][k].state], NULL, this->screen, &pos);
-							break;
-						case CENTER_LEFT:
-							this->pos.y += 48;
-							SDL_BlitSurface(this->game.bunkerCenterLeftSurface[this->game.bunker[i].part[j][k].state], NULL, this->screen, &pos);
-							break;
-						case CENTER_RIGHT:
-							this->pos.y += 48;
-							SDL_BlitSurface(this->game.bunkerCenterRightSurface[this->game.bunker[i].part[j][k].state], NULL, this->screen, &pos);
-							break;
-						case PLAIN:
-							if(j==1) {
-								this->pos.y += 24;
-							}
-							SDL_BlitSurface(this->game.bunkerPlainSurface[this->game.bunker[i].part[j][k].state], NULL, this->screen, &pos);
-							break;
-					}
-				}
+		for(int j=0; j<this->game.bunker[i].part.size(); j++) {
+			this->pos.y = this->game.bunker[i].part[j].y;
+			this->pos.x = this->game.bunker[i].part[j].x;
+			
+			switch(this->game.bunker[i].part[j].type) {
+				case TOP_LEFT:
+					SDL_BlitSurface(this->game.bunkerTopLeftSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
+					break;
+				case TOP_RIGHT:
+					SDL_BlitSurface(this->game.bunkerTopRightSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
+					break;
+				case BOTTOM_LEFT:
+					SDL_BlitSurface(this->game.bunkerBottomLeftSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
+					break;
+				case BOTTOM_RIGHT:
+					SDL_BlitSurface(this->game.bunkerBottomRightSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
+					break;
+				case CENTER_LEFT:
+					SDL_BlitSurface(this->game.bunkerCenterLeftSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
+					break;
+				case CENTER_RIGHT:
+					SDL_BlitSurface(this->game.bunkerCenterRightSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
+					break;
+				case PLAIN:
+					SDL_BlitSurface(this->game.bunkerPlainSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
+					break;
 			}
 		}
 	}
