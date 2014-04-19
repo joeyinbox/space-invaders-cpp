@@ -12,6 +12,7 @@
 			int y;
 			int worth;
 			int resistance;
+			int height;
 			int width;
 			int margin;
 			Type type;

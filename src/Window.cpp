@@ -177,8 +177,8 @@ void Window::displayInGameScreen() {
 	
 	// Display attackers
 	for(int i=0; i<this->game.attacker.size(); i++) {
-		this->pos.x = this->game.attackerPosition.x+this->game.attacker[i].x*80+this->game.attacker[i].margin;
-		this->pos.y = this->game.attackerPosition.y+this->game.attacker[i].y*80;
+		this->pos.x = this->game.attackerPosition.x+this->game.attacker[i].x;
+		this->pos.y = this->game.attackerPosition.y+this->game.attacker[i].y;
 		
 		switch(this->game.attacker[i].type) {
 			case CRAB:
@@ -259,7 +259,7 @@ void Window::startNewGame() {
 	this->stage = INGAME;
 	
 	// Starts a new game
-	this->game.reset();
+	this->game.hardReset();
 	
 	this->displayInGameScreen();
 }

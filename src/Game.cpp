@@ -80,9 +80,13 @@ Game::~Game() {
 	}
 }
 
-void Game::reset() {
+void Game::hardReset() {
 	this->level = 1;
 	this->score = 0;
+	this->reset();
+}
+
+void Game::reset() {
 	this->active = true;
 	this->attackerPosition.x = 80;
 	this->attackerPosition.y = 150;
@@ -94,6 +98,7 @@ void Game::reset() {
 	
 	// Clear an eventual previous array of attackers
 	this->attacker.clear();
+	
 	
 	// Populate all new attackers
 	// Insert all squids
@@ -173,14 +178,40 @@ void Game::update(int now) {
 					}
 				}
 				
-				// Check if the bullet touched an attacker
-				if(still && this->bullet[i].direction==UP) {
-					
+				if(!still) {
+					break;
 				}
-				// Check if the bullet touched the player
-				else if(still && this->bullet[i].direction==DOWN) {
-					
+			}
+			
+			// Check if the bullet touched an attacker
+			if(still && this->bullet[i].direction==UP) {
+				for(int j=this->attacker.size()-1; j>=0; j--) {
+					if(this->bullet[i].x>=this->attackerPosition.x+this->attacker[j].x && this->bullet[i].x<=this->attackerPosition.x+this->attacker[j].x+this->attacker[j].width
+					&& this->bullet[i].y>=this->attackerPosition.y+this->attacker[j].y && this->bullet[i].y<=this->attackerPosition.y+this->attacker[j].y+this->attacker[j].height) {
+						
+						// Increase the score
+						this->score += this->attacker[j].worth;
+						
+						// Destroy that attacker
+						this->attacker[j].explode();
+						this->attacker.erase(attacker.begin()+j);
+						
+						// Remove that bullet
+						this->bullet.erase(bullet.begin()+i);
+						this->wasPlayerBullet(i);
+						
+						// Is the game finished?
+						if(this->attacker.size()==0) {
+							this->level++;
+							this->reset();
+						}
+						break;
+					}
 				}
+			}
+			// Check if the bullet touched the player
+			else if(still && this->bullet[i].direction==DOWN) {
+				
 			}
 		}
 	}

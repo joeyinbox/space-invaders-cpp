@@ -1,8 +1,9 @@
 #include "Attacker.h"
+#include <stdio.h>
 
 Attacker::Attacker(int x, int y, Game *game) {
-	this->x = x;
-	this->y = y;
+	this->x = x*80;
+	this->y = y*80;
 	this->game = game;
 }
 

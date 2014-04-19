@@ -8,10 +8,10 @@ Bullet::Bullet(int x, int y, Direction direction) {
 
 void Bullet::move() {
 	if(this->direction==UP) {
-		this->y -= 5;
+		this->y -= 15;
 	}
 	else {
-		this->y += 5;
+		this->y += 15;
 	}
 }
 

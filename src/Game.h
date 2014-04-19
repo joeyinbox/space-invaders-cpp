@@ -37,11 +37,11 @@
 			Game();
 			~Game();
 			void reset();
+			void hardReset();
 			void updateScore();
 			void updateLevel();
 			void decreaseLife();
 			void move(int shift);
-			void tick();
 			int getSpeedFactor(int now);
 			void update(int now);
 			int getPlayerLife();
