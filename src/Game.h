@@ -5,13 +5,18 @@
 #include "Player.h"
 #include "Bunker.h"
 
-#ifndef DEF_GAME
-#define DEF_GAME
+#ifndef DEF_POSITION
+#define DEF_POSITION
 
 	struct Position {
 		int x;
 		int y;
 	};
+	
+#endif
+
+#ifndef DEF_GAME
+#define DEF_GAME
 
 	class Game {
 		public:
@@ -32,7 +37,9 @@
 			Position attackerPosition;
 			Player player;
 			int direction;
-			int timestamp, timestampShift;
+			int timestamp;
+			int bunkerInitialY;
+			bool over;
 			
 			Game();
 			~Game();
@@ -42,10 +49,10 @@
 			void updateLevel();
 			void decreaseLife();
 			void move(int shift);
-			int getSpeedFactor(int now);
+			float getSpeedFactor(int now);
 			void update(int now);
 			int getPlayerLife();
-			int getPlayerPosition();
+			void setPlayerY(int y);
 			void playerFire();
 			void wasPlayerBullet(int id);
 	};

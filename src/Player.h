@@ -1,14 +1,24 @@
 #include "Attacker.h"
 
+#ifndef DEF_POSITION
+#define DEF_POSITION
+
+	struct Position {
+		int x;
+		int y;
+	};
+	
+#endif
+
 #ifndef DEF_PLAYER
 #define DEF_PLAYER
 
 	class Player {
 		public:
 			int life;
-			int x;
+			Position position;
 			int width;
-			int firing;
+			bool firing;
 			
 			Player();
 			void move(int direction);

@@ -7,9 +7,10 @@
 		public:
 			int x;
 			int y;
+			bool fromPlayer;
 			Direction direction;
 			
-			Bullet(int x, int y, Direction direction);
+			Bullet(int x, int y, bool fromPlayer, Direction direction);
 			void move();
 			void explode();
 	};

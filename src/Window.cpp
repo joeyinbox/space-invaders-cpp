@@ -63,6 +63,9 @@ Window::Window() {
 	// Initialise the baseline of the game
 	this->baseline = {0, static_cast<Sint16>(this->window.height-5), static_cast<Uint16>(this->window.width), 5};
 	
+	// Initialise the player position
+	this->game.setPlayerY(this->window.height-15-this->game.playerSurface->h);
+	
 	// Display the Main screen
 	this->displayMainScreen();
 	
@@ -237,8 +240,8 @@ void Window::displayInGameScreen() {
 	}
 	
 	// Draw the player
-	this->pos.x = this->game.getPlayerPosition();
-	this->pos.y = this->window.height-15-this->game.playerSurface->h;
+	this->pos.x = this->game.player.position.x;
+	this->pos.y = this->game.player.position.y;
 	SDL_BlitSurface(this->game.playerSurface, NULL, this->screen, &pos);
 	
 	// Draw baseline
@@ -250,7 +253,46 @@ void Window::displayInGameScreen() {
 }
 
 void Window::displayGameOver() {
+	// Set a black background
+	SDL_FillRect(this->screen, NULL, SDL_MapRGB(this->screen->format, 0, 0, 0));
 	
+	// Display the title
+	this->txt = TTF_RenderText_Blended(this->fontTitle, "GAME OVER", this->white);
+	this->pos.x = (this->window.width/2)-(this->txt->w/2);
+	this->pos.y = 100;
+	SDL_BlitSurface(this->txt, NULL, this->screen, &pos);
+	
+	
+	// Display the final score
+	this->txt = TTF_RenderText_Blended(this->fontMenu, "*FINAL SCORE*", this->white);
+	this->pos.x = (this->window.width/2)-(this->txt->w/2);
+	this->pos.y = 250;
+	SDL_BlitSurface(this->txt, NULL, this->screen, &pos);
+	
+	// Display the score
+	char txt[20];
+	sprintf(txt, "%d POINTS", this->game.score);
+	this->txt = TTF_RenderText_Blended(this->fontMenu, txt, this->white);
+	this->pos.x = (this->window.width/2)-(this->txt->w/2);
+	this->pos.y += 80;
+	SDL_BlitSurface(this->txt, NULL, this->screen, &pos);
+	
+	// Display the level
+	sprintf(txt, "LEVEL: %d", this->game.level);
+	this->txt = TTF_RenderText_Blended(this->fontMenu, txt, this->white);
+	this->pos.x = (this->window.width/2)-(this->txt->w/2);
+	this->pos.y += 60;
+	SDL_BlitSurface(this->txt, NULL, this->screen, &pos);
+	
+	
+	// Display the instructions
+	this->txt = TTF_RenderText_Blended(this->fontMenu, "PRESS ENTER TO PLAY AGAIN", this->white);
+	this->pos.x = (this->window.width/2)-(this->txt->w/2);
+	this->pos.y = 700;
+	SDL_BlitSurface(this->txt, NULL, this->screen, &pos);
+	
+	// Refresh the screen to show all elements
+	SDL_Flip(this->screen);
 }
 
 
@@ -274,6 +316,11 @@ void Window::handleEvents() {
 	
 	while(run) {
 		SDL_PollEvent(&event);
+		// Is the game finished?
+		if(!this->game.active && this->stage==INGAME) {
+			this->stage = MAIN;
+			this->displayGameOver();
+		}
 		
 		// Pause the application for 30ms
 		currentTimestamp = SDL_GetTicks();
@@ -333,12 +380,12 @@ void Window::handleInGameKeyStroke(int key) {
 			this->game.playerFire();
 			break;
     	case SDLK_LEFT:
-			if(this->game.getPlayerPosition()>=5) {
+			if(this->game.player.position.x>=5) {
 				this->game.move(-5);
 			}
 			break;
     	case SDLK_RIGHT:
-			if(this->game.getPlayerPosition()<=this->window.width-this->game.playerSurface->w-5) {
+			if(this->game.player.position.x<=this->window.width-this->game.playerSurface->w-5) {
 				this->game.move(5);
 			}
 			break;

@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
 #include "Game.h"
 #include "Crab.h"
 #include "Octopus.h"
@@ -48,6 +51,12 @@ Game::Game() {
 	this->bunkerPlainSurface.push_back(IMG_Load("res/img/bunker/plain-3.png"));
 	
 	this->active = false;
+	
+	// Initialise pseudo-randomness
+	srand(time(NULL));
+	
+	// Set the initial position of bunkers
+	this->bunkerInitialY = 600;
 }
 
 
@@ -94,7 +103,6 @@ void Game::reset() {
 	
 	// Hold the time of the beginning of the game
 	this->timestamp = SDL_GetTicks();
-	this->timestampShift = this->timestamp;
 	
 	// Clear an eventual previous array of attackers
 	this->attacker.clear();
@@ -128,7 +136,7 @@ void Game::reset() {
 	
 	// Populate all new bunkers
 	for(int i=0; i<4; i++) {
-		Bunker bunker = Bunker(i, 600);
+		Bunker bunker = Bunker(i, this->bunkerInitialY);
 		this->bunker.push_back(bunker);
 	}
 	
@@ -140,14 +148,35 @@ void Game::reset() {
 }
 
 void Game::update(int now) {
-	if(this->attackerPosition.x<=0 || this->attackerPosition.x+855>=1024) {
-		this->direction *= -1;
+	// Get the first or last attacker horizontaly and the lower one
+	int extremH = 0;
+	int extremV = 0;
+	for(int i=1; i<this->attacker.size(); i++) {
+		if(this->direction==1 && this->attacker[i].x>this->attacker[extremH].x) {
+			extremH = i;
+		}
+		else if(this->direction==-1 && this->attacker[i].x<this->attacker[extremH].x) {
+			extremH = i;
+		}
+		
+		if(this->attacker[i].y>this->attacker[extremH].y) {
+			extremV = i;
+		}
 	}
-	this->attackerPosition.x += this->direction;
 	
-	if(now>this->timestampShift+5000) {
+	// Move the attackers
+	this->attackerPosition.x += this->direction*(1+(int)round(this->getSpeedFactor(now)));
+	
+	// Check if attackers needs to turn
+	if((this->direction==1 && this->attacker[extremH].x+this->attackerPosition.x+this->attacker[extremH].width>=1024) || (this->direction==-1 && this->attacker[extremH].x+this->attackerPosition.x<=0)) {
+		this->direction *= -1;
 		this->attackerPosition.y += 10;
-		this->timestampShift = now;
+		
+		// Have the attackers just landed?
+		if(this->attacker[extremV].y+this->attacker[extremV].height+this->attackerPosition.y>this->bunkerInitialY+72) {
+			// Game over
+			this->active = false;
+		}
 	}
 	
 	// Update bullets positions
@@ -156,9 +185,9 @@ void Game::update(int now) {
 		
 		// Check if the bullet got out of the screen
 		if(this->bullet[i].y<0-this->bulletSurface->h || this->bullet[i].y>770) {
-			this->bullet.erase(bullet.begin()+i);
-			// Eventually notify the user that he can fire again
+			// Eventually allow the player to fire again and remove the bullet
 			this->wasPlayerBullet(i);
+			this->bullet.erase(bullet.begin()+i);
 		}
 		else {
 			// Check if the bullet touched a bunker
@@ -167,10 +196,12 @@ void Game::update(int now) {
 				for(int k=0; k<this->bunker[j].part.size(); k++) {
 					if(this->bullet[i].x>=this->bunker[j].part[k].x && this->bullet[i].x<=this->bunker[j].part[k].x+(this->bunker[j].width/4)
 					&& this->bullet[i].y>=this->bunker[j].part[k].y && this->bullet[i].y<=this->bunker[j].part[k].y+(this->bunker[j].width/4)) {
+						// Notify the bunker that it is hurt
 						this->bunker[j].hurt(k);
-						this->bullet.erase(bullet.begin()+i);
-						// Eventually notify the user that he can fire again
+						
+						// Eventually allow the player to fire again and remove the bullet
 						this->wasPlayerBullet(i);
+						this->bullet.erase(bullet.begin()+i);
 						
 						// There is no break for nested loops in C++ --> A flag or a Goto?
 						still = false;
@@ -196,13 +227,14 @@ void Game::update(int now) {
 						this->attacker[j].explode();
 						this->attacker.erase(attacker.begin()+j);
 						
-						// Remove that bullet
-						this->bullet.erase(bullet.begin()+i);
+						// Eventually allow the player to fire again and remove the bullet
 						this->wasPlayerBullet(i);
+						this->bullet.erase(bullet.begin()+i);
 						
 						// Is the game finished?
 						if(this->attacker.size()==0) {
 							this->level++;
+							this->player.life++;
 							this->reset();
 						}
 						break;
@@ -211,15 +243,25 @@ void Game::update(int now) {
 			}
 			// Check if the bullet touched the player
 			else if(still && this->bullet[i].direction==DOWN) {
-				
+				if(this->bullet[i].x>=this->player.position.x && this->bullet[i].x<=this->player.position.x+this->playerSurface->w
+				&& this->bullet[i].y+this->bulletSurface->h>=this->player.position.y) {
+					this->decreaseLife();
+					
+					// Remove all bullets and allow the player to fire again
+					this->player.firing = false;
+					this->bullet.clear();
+					break;
+				}
 			}
 		}
 	}
+	
+	// Attackers can fire from time to time
+	
 }
 
 void Game::decreaseLife() {
 	if(--this->player.life==0) {
-		// TODO: implement end of game
 		this->active = false;
 	}
 }
@@ -232,20 +274,24 @@ int Game::getPlayerLife() {
 	return this->player.life;
 }
 
-int Game::getPlayerPosition() {
-	return this->player.x;
+void Game::setPlayerY(int y) {
+	this->player.position.y = y;
 }
 
 void Game::wasPlayerBullet(int id) {
-	if(this->player.firing==id) {
-		this->player.firing = -1;
+	if(this->bullet[id].fromPlayer) {
+		this->player.firing = false;
 	}
 }
 
 void Game::playerFire() {
-	if(this->player.firing==-1) {
-		Bullet bullet = Bullet(this->getPlayerPosition()+(this->playerSurface->w/2), 755-this->playerSurface->h, UP);
+	if(!this->player.firing) {
+		Bullet bullet = Bullet(this->player.position.x+(this->playerSurface->w/2), 755-this->playerSurface->h, true, UP);
 		this->bullet.push_back(bullet);
-		this->player.firing = this->bullet.size()-1;
+		this->player.firing = true;
 	}
+}
+
+float Game::getSpeedFactor(int now) {
+	return (round(((now-this->timestamp)*this->level)/50))/1000;
 }

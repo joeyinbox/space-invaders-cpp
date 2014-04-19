@@ -1,5 +1,15 @@
 #include "Bullet.h"
 
+#ifndef DEF_POSITION
+#define DEF_POSITION
+
+	struct Position {
+		int x;
+		int y;
+	};
+	
+#endif
+
 #ifndef DEF_ATTACKER
 #define DEF_ATTACKER
 	
@@ -10,6 +20,7 @@
 		public:
 			int x;
 			int y;
+			Position grid;
 			int worth;
 			int resistance;
 			int height;
