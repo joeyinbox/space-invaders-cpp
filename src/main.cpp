@@ -1,6 +1,6 @@
 #include "Window.h"
 
-extern "C" int main(int argc, char ** argv) {
+int main(int argc, char ** argv) {
 	
 	// Create a new window
 	Window window;

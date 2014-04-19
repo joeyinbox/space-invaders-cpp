@@ -1,7 +1,13 @@
 #include "Crab.h"
 #include <stdio.h>
 
-Crab::Crab(int x, int y, Game *game) : Attacker(x, y, game) {
+/**
+ * Constructor of the Crab class inherited from Attacker to initialise all common variables
+ *
+ * @param	x		the grid horizontal position of the crab; also used to get its position
+ * @param	y		the grid vertical position of the crab; also used to get its position
+ */
+Crab::Crab(int x, int y) : Attacker(x, y) {
 	this->type = CRAB;
 	this->worth = 20;
 	this->resistance = 1;

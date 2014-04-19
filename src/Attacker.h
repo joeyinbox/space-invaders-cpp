@@ -27,9 +27,8 @@
 			int width;
 			int margin;
 			Type type;
-			Game *game;
 			
-			Attacker(int x, int y, Game *game);
+			Attacker(int x, int y);
 			bool hurt();
 	};
 	

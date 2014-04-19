@@ -6,13 +6,18 @@
 #include <SDL/SDL_ttf.h>
 #include "Game.h"
 
-#ifndef DEF_WINDOW
-#define DEF_WINDOW
+#ifndef DEF_DIMENSION
+#define DEF_DIMENSION
 
 	struct Dimension {
 		int width = 0;
 		int height = 0;
 	};
+
+#endif
+
+#ifndef DEF_WINDOW
+#define DEF_WINDOW
 	
 	enum Stage {MAIN, INGAME};
 

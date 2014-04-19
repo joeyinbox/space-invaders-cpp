@@ -5,11 +5,7 @@ using namespace std;
 
 
 /**
- * Initialise all window variables and create a window
- * 
- * @param	none
- * @return	void
- *
+ * Initialise all window variables, load fonts and create a window
  */
 Window::Window() {
 	// Initialise surfaces
@@ -73,18 +69,25 @@ Window::Window() {
 	this->handleEvents();
 }
 
+/**
+ * Free all allocated memory
+ */
 Window::~Window() {
-	// Free all allocated memory
+	// Free font memory
 	TTF_CloseFont(this->fontTitle);
 	TTF_CloseFont(this->fontMenu);
 	TTF_CloseFont(this->fontStatus);
 	TTF_Quit();
 	
+	// Free surface memory
 	SDL_FreeSurface(this->txt);
+	SDL_FreeSurface(this->screen);
 	SDL_Quit();
 }
 
-
+/**
+ * Display the main screen elements
+ */
 void Window::displayMainScreen() {
 	// Set a black background
 	SDL_FillRect(this->screen, NULL, SDL_MapRGB(this->screen->format, 0, 0, 0));
@@ -150,6 +153,9 @@ void Window::displayMainScreen() {
 	SDL_Flip(this->screen);
 }
 
+/**
+ * Display in game elements such as the statistics, attackers, the player or the baseline
+ */
 void Window::displayInGameScreen() {
 	// Set a black background
 	SDL_FillRect(this->screen, NULL, SDL_MapRGB(this->screen->format, 0, 0, 0));
@@ -250,7 +256,7 @@ void Window::displayInGameScreen() {
 	this->pos.y = this->game.player.position.y;
 	SDL_BlitSurface(this->game.playerSurface, NULL, this->screen, &pos);
 	
-	// Draw baseline
+	// Draw the baseline
 	SDL_FillRect(this->screen, &this->baseline, SDL_MapRGB(this->screen->format, 62, 255, 63));
 	
 	
@@ -258,6 +264,9 @@ void Window::displayInGameScreen() {
 	SDL_Flip(this->screen);
 }
 
+/**
+ * Display the Game Over screen showing the final score
+ */
 void Window::displayGameOver() {
 	// Set a black background
 	SDL_FillRect(this->screen, NULL, SDL_MapRGB(this->screen->format, 0, 0, 0));
@@ -301,7 +310,9 @@ void Window::displayGameOver() {
 	SDL_Flip(this->screen);
 }
 
-
+/**
+ * Reset all related variables and start a new game
+ */
 void Window::startNewGame() {
 	// Set the current stage to In Game
 	this->stage = INGAME;
@@ -312,6 +323,9 @@ void Window::startNewGame() {
 	this->displayInGameScreen();
 }
 
+/**
+ * Handle general keyboard events and fire update queries to refresh the game
+ */
 void Window::handleEvents() {
 	int run = 1;
 	int currentTimestamp, previousTimestamp = SDL_GetTicks();
@@ -328,7 +342,7 @@ void Window::handleEvents() {
 			this->displayGameOver();
 		}
 		
-		// Pause the application for 30ms
+		// The application will refresh itself every 30ms (~33 fps)
 		currentTimestamp = SDL_GetTicks();
 		if(currentTimestamp-previousTimestamp>30) {
 		    previousTimestamp = currentTimestamp;
@@ -357,18 +371,22 @@ void Window::handleEvents() {
 					break;
 			}
 			
-			// Update the attackers position while in game
+			// Update the game if needed
 			if(this->stage==INGAME) {
 				this->game.update(currentTimestamp);
 				this->displayInGameScreen();
 			}
 		}
 		else {
+			// Pause the application for 30ms
 			SDL_Delay(30-(currentTimestamp-previousTimestamp));
 		}
 	}
 }
 
+/**
+ * Handle all keyboard events related to the main and game over screen
+ */
 void Window::handleMainKeyStroke(int key) {
 	switch(key) {
 		case SDLK_RETURN:
@@ -380,17 +398,22 @@ void Window::handleMainKeyStroke(int key) {
 	}
 }
 
+/**
+ * Handle all keyboard events while in game
+ */
 void Window::handleInGameKeyStroke(int key) {
 	switch(key) {
     	case SDLK_SPACE:
 			this->game.playerFire();
 			break;
     	case SDLK_LEFT:
+			// Prevent to exceed the screen limits
 			if(this->game.player.position.x>=5) {
 				this->game.move(-5);
 			}
 			break;
     	case SDLK_RIGHT:
+			// Prevent to exceed the screen limits
 			if(this->game.player.position.x<=this->window.width-this->game.playerSurface->w-5) {
 				this->game.move(5);
 			}

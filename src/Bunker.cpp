@@ -1,14 +1,22 @@
 #include "Bunker.h"
 
+/**
+ * Constructor of the class Bunker to initialise all 12 parts which constitute itself
+ *
+ * @param	x	the horizontal position of the bunker
+ * @param	y	the vertical position of the bunker
+ */
 Bunker::Bunker(int x, int y) {
 	this->width = 96;
 	this->x = 170+(x*(this->width+100));
 	this->y = y;
 	
 	
-	// Initialise all parts
+	// Initialise all 12 parts top to bottom and left to right.
+	// 7 types can represent all 12 parts (eg. TOP_LEFT, PLAIN, TOP_RIGHT, etc...)
 	Part part;
 	
+	// First row
 	part.state = INITIAL;
 	part.type = TOP_LEFT;
 	part.x = this->x;
@@ -60,8 +68,14 @@ Bunker::Bunker(int x, int y) {
 	this->part.push_back(part);
 }
 
+/**
+ * Update the state of a part that has been hurt
+ *
+ * @param	partId	identifier of the part that has been hurt
+ */
 void Bunker::hurt(int partId) {
-	// affect the state of the part
+	// The following can be done by incrementing the state by one and check if it is then equal to the value of DESTROYED
+	// At the only condition that all states are declared in the right order
 	switch(this->part[partId].state) {
 		case INITIAL:
 			this->part[partId].state = MINOR;

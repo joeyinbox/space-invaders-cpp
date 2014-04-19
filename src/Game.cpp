@@ -11,6 +11,9 @@
 using namespace std;
 
 
+/**
+ * Constructor of the Game class to load additional resources and initialise variables
+ */
 Game::Game() {
 	// Load all resources
 	this->playerSurface = IMG_Load("res/img/player.png");
@@ -50,6 +53,7 @@ Game::Game() {
 	this->bunkerPlainSurface.push_back(IMG_Load("res/img/bunker/plain-2.png"));
 	this->bunkerPlainSurface.push_back(IMG_Load("res/img/bunker/plain-3.png"));
 	
+	// The game is not currently started
 	this->active = false;
 	
 	// Initialise pseudo-randomness
@@ -59,6 +63,9 @@ Game::Game() {
 	this->bunkerInitialY = 600;
 }
 
+/**
+ * Destructor of the Game class to free all allocated memory
+ */
 Game::~Game() {
 	// Free all resources
 	SDL_FreeSurface(this->playerSurface);
@@ -88,6 +95,9 @@ Game::~Game() {
 	}
 }
 
+/**
+ * Reset all variables to be able to start an entirely new game
+ */
 void Game::hardReset() {
 	this->level = 1;
 	this->score = 0;
@@ -95,30 +105,33 @@ void Game::hardReset() {
 	this->reset();
 }
 
+/**
+ * Reset all variables to continue an eventual current game
+ */
 void Game::reset() {
 	this->active = true;
 	this->attackerPosition.x = 80;
 	this->attackerPosition.y = 150;
-	this->direction = 1;
+	this->attackerDirection = 1;
 	
 	// Hold the time of the beginning of the game
 	this->timestamp = SDL_GetTicks();
 	
-	// Clear an eventual previous array of attackers
+	// Clear an eventual previous attackers
 	this->attacker.clear();
 	
 	
 	// Populate all new attackers
 	// Insert all squids
 	for(int i=0; i<11; i++) {
-		Squid squid = Squid(i, 0, this);
+		Squid squid = Squid(i, 0);
 		this->attacker.push_back(squid);
 	}
 	
 	// Then all crabs
 	for(int i=0; i<11; i++) {
 		for(int j=1; j<3; j++) {
-			Crab crab = Crab(i, j, this);
+			Crab crab = Crab(i, j);
 			this->attacker.push_back(crab);
 		}
 	}
@@ -126,12 +139,12 @@ void Game::reset() {
 	// And finally, all octopuses
 	for(int i=0; i<11; i++) {
 		for(int j=3; j<5; j++) {
-			Octopus octopus = Octopus(i, j, this);
+			Octopus octopus = Octopus(i, j);
 			this->attacker.push_back(octopus);
 		}
 	}
 	
-	// Clear an eventual previous array of bunkers
+	// Clear an eventual previous bunkers
 	this->bunker.clear();
 	
 	// Populate all new bunkers
@@ -150,15 +163,23 @@ void Game::reset() {
 	this->spaceship.reset();
 }
 
+/**
+ * Update all game element attributes
+ * This is called every X decided FPS to refresh for example the position of the attackers, bullets, etc..
+ * This also detects all colisions between bullets, attackers, bunkers and the ground.
+ * Finally, this make randomly spawn a spaceship for extra bonus
+ *
+ * @param	now		the current timestamp
+ */
 void Game::update(int now) {
-	// Get the first and last attacker horizontaly and the lower one
+	// Get the first and last attackers horizontaly and the lower one to detect the boundaries of the attackers' wave
 	int extremH = 0;
 	int extremV = 0;
 	for(int i=1; i<this->attacker.size(); i++) {
-		if(this->direction==1 && this->attacker[i].x>this->attacker[extremH].x) {
+		if(this->attackerDirection==1 && this->attacker[i].x>this->attacker[extremH].x) {
 			extremH = i;
 		}
-		else if(this->direction==-1 && this->attacker[i].x<this->attacker[extremH].x) {
+		else if(this->attackerDirection==-1 && this->attacker[i].x<this->attacker[extremH].x) {
 			extremH = i;
 		}
 		
@@ -167,12 +188,11 @@ void Game::update(int now) {
 		}
 	}
 	
-	// Move the attackers
-	this->attackerPosition.x += this->direction*(1+(int)round(this->getSpeedFactor(now)));
-	
-	// Check if attackers needs to turn
-	if((this->direction==1 && this->attacker[extremH].x+this->attackerPosition.x+this->attacker[extremH].width>=1024) || (this->direction==-1 && this->attacker[extremH].x+this->attackerPosition.x<=0)) {
-		this->direction *= -1;
+	// Check if attackers needs to turn as they reach the limits of the screen
+	if((this->attackerDirection==1 && this->attacker[extremH].x+this->attackerPosition.x+this->attacker[extremH].width>=1024) || (this->attackerDirection==-1 && this->attacker[extremH].x+this->attackerPosition.x<=0)) {
+		this->attackerDirection *= -1;
+		
+		// In addition, all attackers move down
 		this->attackerPosition.y += 10;
 		
 		// Have the attackers just landed?
@@ -181,6 +201,9 @@ void Game::update(int now) {
 			this->active = false;
 		}
 	}
+	
+	// Move the attackers
+	this->attackerPosition.x += this->attackerDirection*(1+(int)round(this->getSpeedFactor(now)));
 	
 	// Move an eventual spaceship
 	if(this->spaceship.active) {
@@ -246,7 +269,7 @@ void Game::update(int now) {
 						this->wasPlayerBullet(i);
 						this->bullet.erase(bullet.begin()+i);
 						
-						// Is the game finished?
+						// Is the wave finished?
 						if(this->attacker.size()==0) {
 							this->level++;
 							this->player.life++;
@@ -260,7 +283,7 @@ void Game::update(int now) {
 						// Increase the score
 						this->score += this->spaceship.worth;
 						
-						// Destroy eventually that attacker
+						// Destroy eventually that spaceship
 						if(this->spaceship.hurt()) {
 							this->spaceship.reset();
 						}
@@ -287,12 +310,12 @@ void Game::update(int now) {
 		}
 	}
 	
-	// Attackers can fire from time to time
+	// Attackers can fire from time to time with an increasing chance as the game lasts and the level increases
 	int probability = rand()%910;
 	probability += this->getSpeedFactor(now)*10;
 	
 	if(probability>900) {
-		// Take a lowest random attacker between columns
+		// Take a lowest random attacker between all represented columns
 		vector<int> lowest;
 		
 		for(int i=0; i<this->attacker.size(); i++) {
@@ -322,7 +345,6 @@ void Game::update(int now) {
 	// Finally, a spaceship can spawn
 	probability = rand()%1000;
 	if(!this->spaceship.active && probability>995) {
-		printf("%d\n", probability);
 		if(probability%2==0) {
 			this->spaceship.setDirection(1);
 		}
@@ -332,38 +354,75 @@ void Game::update(int now) {
 	}
 }
 
+/**
+ * Decrease the life of the player and therefore, check if the game is over
+ */
 void Game::decreaseLife() {
 	if(--this->player.life==0) {
 		this->active = false;
 	}
 }
 
+/**
+ * Make the player move either to the left or the right
+ *
+ * @param	shift	positive or negative value to shift the player horizontaly
+ */
 void Game::move(int shift) {
 	this->player.move(shift);
 }
 
+/**
+ * Return the number of remaining lives of the player
+ *
+ * @return	the number of remaining lives of the player
+ */
 int Game::getPlayerLife() {
 	return this->player.life;
 }
 
+/**
+ * Set the vertical position of the player
+ * Normally called by the Window class to make it relative to the bottom of the latter
+ *
+ * @param	y	the vertical position of the player
+ */
 void Game::setPlayerY(int y) {
 	this->player.position.y = y;
 }
 
+/**
+ * Verify if a bullet is emitted by the player to allow the latter to fire again as the bullet will be destroyed
+ *
+ * @param	id		the identifier of the bullet to verify
+ */
 void Game::wasPlayerBullet(int id) {
 	if(this->bullet[id].fromPlayer) {
 		this->player.firing = false;
 	}
 }
 
+/**
+ * Verify if the player can fire a bullet and eventually fire it
+ */
 void Game::playerFire() {
 	if(!this->player.firing) {
 		Bullet bullet = Bullet(this->player.position.x+(this->playerSurface->w/2), 755-this->playerSurface->h, true, UP);
 		this->bullet.push_back(bullet);
+		
+		// The player won't be able to fire again as long as its bullet is not destroyed or lost
 		this->player.firing = true;
 	}
 }
 
+/**
+ * Return the speed factor calculated with the time elasped since the begining of the wave and the current level
+ * Increased by 1 every 50 seconds at level 1
+ * Increased by 1 every 25 seconds at level 2
+ * And so on..
+ *
+ * @return	the speed factor
+ */
 float Game::getSpeedFactor(int now) {
 	return (round(((now-this->timestamp)*this->level)/50))/1000;
 }

@@ -36,12 +36,11 @@
 			std::vector<Bunker> bunker;
 			std::vector<Bullet> bullet;
 			Position attackerPosition;
+			int attackerDirection;
 			Player player;
-			Spaceship spaceship = Spaceship(0, 2, this);
-			int direction;
+			Spaceship spaceship = Spaceship(0, 2);
 			int timestamp;
 			int bunkerInitialY;
-			bool over;
 			
 			Game();
 			~Game();

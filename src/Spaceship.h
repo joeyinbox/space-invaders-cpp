@@ -8,7 +8,7 @@
 			bool active;
 			int direction;
 			
-			Spaceship(int x, int y, Game *game);
+			Spaceship(int x, int y);
 			void reset();
 			void setDirection(int direction);
 	};

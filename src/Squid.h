@@ -5,7 +5,7 @@
 
 	class Squid : public Attacker {
 		public:
-			Squid(int x, int y, Game *game);
+			Squid(int x, int y);
 	};
 	
 #endif

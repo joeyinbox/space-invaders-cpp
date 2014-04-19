@@ -17,7 +17,6 @@
 		public:
 			int life;
 			Position position;
-			int width;
 			bool firing;
 			
 			Player();
