@@ -9,27 +9,7 @@ Attacker::Attacker(int x, int y, Game *game) {
 	this->game = game;
 }
 
-
-void Attacker::moveLeft() {
-	
-}
-
-
-void Attacker::moveRight() {
-	
-}
-
-
-void Attacker::moveDown() {
-	
-}
-
-
-void Attacker::fire() {
-	
-}
-
-
-void Attacker::explode() {
-	
+bool Attacker::hurt() {
+	// This has been hurt. Is it destroyed?
+	return (--this->resistance<=0);
 }

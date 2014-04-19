@@ -12,7 +12,6 @@
 			
 			Bullet(int x, int y, bool fromPlayer, Direction direction);
 			void move();
-			void explode();
 	};
 	
 #endif

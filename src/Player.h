@@ -22,8 +22,8 @@
 			
 			Player();
 			void move(int direction);
-			void explode();
 			void reset();
+			void hardReset();
 	};
 	
 #endif

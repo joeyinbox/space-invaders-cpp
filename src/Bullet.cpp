@@ -15,7 +15,3 @@ void Bullet::move() {
 		this->y += 15;
 	}
 }
-
-void Bullet::explode() {
-	
-}

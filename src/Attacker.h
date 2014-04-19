@@ -30,11 +30,7 @@
 			Game *game;
 			
 			Attacker(int x, int y, Game *game);
-			void moveLeft();
-			void moveRight();
-			void moveDown();
-			void fire();
-			void explode();
+			bool hurt();
 	};
 	
 #endif

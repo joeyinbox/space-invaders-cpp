@@ -92,6 +92,7 @@ Game::~Game() {
 void Game::hardReset() {
 	this->level = 1;
 	this->score = 0;
+	this->player.hardReset();
 	this->reset();
 }
 
@@ -148,7 +149,7 @@ void Game::reset() {
 }
 
 void Game::update(int now) {
-	// Get the first or last attacker horizontaly and the lower one
+	// Get the first and last attacker horizontaly and the lower one
 	int extremH = 0;
 	int extremV = 0;
 	for(int i=1; i<this->attacker.size(); i++) {
@@ -223,9 +224,10 @@ void Game::update(int now) {
 						// Increase the score
 						this->score += this->attacker[j].worth;
 						
-						// Destroy that attacker
-						this->attacker[j].explode();
-						this->attacker.erase(attacker.begin()+j);
+						// Destroy eventually that attacker
+						if(this->attacker[j].hurt()) {
+							this->attacker.erase(attacker.begin()+j);
+						}
 						
 						// Eventually allow the player to fire again and remove the bullet
 						this->wasPlayerBullet(i);
@@ -257,7 +259,35 @@ void Game::update(int now) {
 	}
 	
 	// Attackers can fire from time to time
+	int probability = rand()%910;
+	probability += this->getSpeedFactor(now)*10;
 	
+	if(probability>900) {
+		// Take a lowest random attacker between columns
+		vector<int> lowest;
+		
+		for(int i=0; i<this->attacker.size(); i++) {
+			bool found = false;
+			for(int j=0; j<lowest.size(); j++) {
+				if(this->attacker[i].grid.x==this->attacker[lowest[j]].grid.x) {
+					if(this->attacker[i].grid.y>this->attacker[lowest[j]].grid.y) {
+						lowest[j] = i;
+					}
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found) {
+				lowest.push_back(i);
+			}
+		}
+		
+		// Make a random attacker fire
+		int id = rand()%lowest.size();
+		Bullet bullet = Bullet(this->attackerPosition.x+this->attacker[lowest[id]].x+(this->attacker[lowest[id]].width/2), this->attacker[lowest[id]].y+this->attackerPosition.y+this->attacker[lowest[id]].height, false, DOWN);
+		this->bullet.push_back(bullet);
+	}
 }
 
 void Game::decreaseLife() {
