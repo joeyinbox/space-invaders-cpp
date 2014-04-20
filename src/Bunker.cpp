@@ -50,7 +50,7 @@ Bunker::Bunker(int x, int y) {
 	this->part.push_back(part);
 	
 	// Third row
-	part.type = BOTTOM_LEFT;
+	part.type = PLAIN;
 	part.x = this->x;
 	part.y += this->width/4;
 	this->part.push_back(part);
@@ -63,7 +63,7 @@ Bunker::Bunker(int x, int y) {
 	part.x += this->width/4;
 	this->part.push_back(part);
 	
-	part.type = BOTTOM_RIGHT;
+	part.type = PLAIN;
 	part.x += this->width/4;
 	this->part.push_back(part);
 }

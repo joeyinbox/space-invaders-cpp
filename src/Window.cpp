@@ -225,12 +225,6 @@ void Window::displayInGameScreen() {
 				case TOP_RIGHT:
 					SDL_BlitSurface(this->game.bunkerTopRightSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
 					break;
-				case BOTTOM_LEFT:
-					SDL_BlitSurface(this->game.bunkerBottomLeftSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
-					break;
-				case BOTTOM_RIGHT:
-					SDL_BlitSurface(this->game.bunkerBottomRightSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
-					break;
 				case CENTER_LEFT:
 					SDL_BlitSurface(this->game.bunkerCenterLeftSurface[this->game.bunker[i].part[j].state], NULL, this->screen, &pos);
 					break;

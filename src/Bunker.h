@@ -4,7 +4,7 @@
 #define DEF_BUNKER
 
 	enum State {INITIAL, MINOR, PARTIAL, MAJOR};
-	enum PartType {TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER_LEFT, CENTER_RIGHT, PLAIN};
+	enum PartType {TOP_LEFT, TOP_RIGHT, CENTER_LEFT, CENTER_RIGHT, PLAIN};
 	struct Part {
 		State state;
 		PartType type;

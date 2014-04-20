@@ -27,8 +27,6 @@
 			SDL_Surface *playerSurface, *crab, *octopus, *squid, *spaceshipSurface, *bulletSurface;
 			std::vector<SDL_Surface*> bunkerTopLeftSurface, 
 									  bunkerTopRightSurface, 
-									  bunkerBottomLeftSurface, 
-									  bunkerBottomRightSurface, 
 									  bunkerCenterLeftSurface, 
 									  bunkerCenterRightSurface,
 									  bunkerPlainSurface;

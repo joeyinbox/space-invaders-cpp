@@ -32,14 +32,6 @@ Game::Game() {
 	this->bunkerTopRightSurface.push_back(IMG_Load("res/img/bunker/top-right-1.png"));
 	this->bunkerTopRightSurface.push_back(IMG_Load("res/img/bunker/top-right-2.png"));
 	this->bunkerTopRightSurface.push_back(IMG_Load("res/img/bunker/top-right-3.png"));
-	this->bunkerBottomLeftSurface.push_back(IMG_Load("res/img/bunker/bottom-left-0.png"));
-	this->bunkerBottomLeftSurface.push_back(IMG_Load("res/img/bunker/bottom-left-1.png"));
-	this->bunkerBottomLeftSurface.push_back(IMG_Load("res/img/bunker/bottom-left-2.png"));
-	this->bunkerBottomLeftSurface.push_back(IMG_Load("res/img/bunker/bottom-left-3.png"));
-	this->bunkerBottomRightSurface.push_back(IMG_Load("res/img/bunker/bottom-right-0.png"));
-	this->bunkerBottomRightSurface.push_back(IMG_Load("res/img/bunker/bottom-right-1.png"));
-	this->bunkerBottomRightSurface.push_back(IMG_Load("res/img/bunker/bottom-right-2.png"));
-	this->bunkerBottomRightSurface.push_back(IMG_Load("res/img/bunker/bottom-right-3.png"));
 	this->bunkerCenterLeftSurface.push_back(IMG_Load("res/img/bunker/center-left-0.png"));
 	this->bunkerCenterLeftSurface.push_back(IMG_Load("res/img/bunker/center-left-1.png"));
 	this->bunkerCenterLeftSurface.push_back(IMG_Load("res/img/bunker/center-left-2.png"));
@@ -80,12 +72,6 @@ Game::~Game() {
 	}
 	for(int i=0; i<this->bunkerTopRightSurface.size(); i++) {
 		SDL_FreeSurface(this->bunkerTopRightSurface[i]);
-	}
-	for(int i=0; i<this->bunkerBottomLeftSurface.size(); i++) {
-		SDL_FreeSurface(this->bunkerBottomLeftSurface[i]);
-	}
-	for(int i=0; i<this->bunkerBottomRightSurface.size(); i++) {
-		SDL_FreeSurface(this->bunkerBottomRightSurface[i]);
 	}
 	for(int i=0; i<this->bunkerCenterLeftSurface.size(); i++) {
 		SDL_FreeSurface(this->bunkerCenterLeftSurface[i]);
