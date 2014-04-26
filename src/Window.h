@@ -23,7 +23,7 @@
 
 	class Window {
 		public:
-			SDL_Surface *screen, *txt;
+			SDL_Surface *screen, *txt, *background;
 			TTF_Font *fontTitle, *fontMenu, *fontStatus;
 			SDL_Color white;
 			SDL_Rect baseline;

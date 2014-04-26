@@ -58,6 +58,9 @@ Window::Window() {
 	
 	// Initialise the baseline of the game
 	this->baseline = {0, static_cast<Sint16>(this->window.height-5), static_cast<Uint16>(this->window.width), 5};
+    
+    // Load the background
+    this->background = IMG_Load("res/img/background.png");
 	
 	// Initialise the player position
 	this->game.setPlayerY(this->window.height-15-this->game.playerSurface->h);
@@ -82,6 +85,7 @@ Window::~Window() {
 	// Free surface memory
 	SDL_FreeSurface(this->txt);
 	SDL_FreeSurface(this->screen);
+    SDL_FreeSurface(this->background);
 	SDL_Quit();
 }
 
@@ -89,8 +93,10 @@ Window::~Window() {
  * Display the main screen elements
  */
 void Window::displayMainScreen() {
-	// Set a black background
-	SDL_FillRect(this->screen, NULL, SDL_MapRGB(this->screen->format, 0, 0, 0));
+    // Set the background
+	this->pos.x = 0;
+	this->pos.y = 0;
+    SDL_BlitSurface(this->background, NULL, this->screen, &pos);
 	
 	// Display the title
 	this->txt = TTF_RenderText_Blended(this->fontTitle, "Space Intruders", this->white);
@@ -157,8 +163,10 @@ void Window::displayMainScreen() {
  * Display in game elements such as the statistics, attackers, the player or the baseline
  */
 void Window::displayInGameScreen() {
-	// Set a black background
-	SDL_FillRect(this->screen, NULL, SDL_MapRGB(this->screen->format, 0, 0, 0));
+    // Set the background
+	this->pos.x = 0;
+	this->pos.y = 0;
+    SDL_BlitSurface(this->background, NULL, this->screen, &pos);
 	
 	// Display the status
 	// Level
@@ -262,8 +270,10 @@ void Window::displayInGameScreen() {
  * Display the Game Over screen showing the final score
  */
 void Window::displayGameOver() {
-	// Set a black background
-	SDL_FillRect(this->screen, NULL, SDL_MapRGB(this->screen->format, 0, 0, 0));
+    // Set the background
+	this->pos.x = 0;
+	this->pos.y = 0;
+    SDL_BlitSurface(this->background, NULL, this->screen, &pos);
 	
 	// Display the title
 	this->txt = TTF_RenderText_Blended(this->fontTitle, "GAME OVER", this->white);
